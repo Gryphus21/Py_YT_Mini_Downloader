@@ -1,7 +1,7 @@
 import re
 
 class RegexYtMatcher():
-    # Latest: https://regex101.com/r/hrLz72/32
+    # Latest: https://regex101.com/r/tJvDHf/1
     # Based on https://regex101.com/r/OY96XI/1 by mi-ca
     PATTERN = r"^(?:https?:)?(?:\/\/)?(?:(?:www\.|m\.)?youtube(?:-nocookie)?\.com\/(?:v\/|e\/|embed\/|w\/|(?:watch\?v=|(?:(?:\?|watch\?)(?:[\w]+=[\w]+&?)+)&v=)?|shorts\/)|youtu\.be\/(?:watch\?v=)?)([\w-]{11})(?=[^\w-]|$)(?![?=&+%\w.-]*(?:['\"][^<>]*>|<\/a>))[?=&+%\w.-]*$"
     result = None
