@@ -111,6 +111,10 @@ class Client():
 
         return download_server_response_json_obj
     
+    def massive_download_on_server(self, media_url: str, video_resolution: VideoResolution) -> str:
+        return self._request_video_download_on_server(media_url=media_url, video_resolution=video_resolution).id
+
+    
     def __get_download_progress(self, download_id: str) -> DownloadProgressResponse:
         #xhr_progress_url = UrlMaker.make_progress_url(download_id, self.use_https)
         xhr_progress_url = UrlMaker.get_progress_url(self.use_https)
@@ -225,6 +229,7 @@ class Client():
             mcp.print_red('Eccezione gestitama non identificata')
             mcp.print_red(traceback.format_exc())
         
+
         if (progress_text is None): # 'null'
             mcp.print_cyan('Pre-Initialising (null)')
         elif (progress_text == 'error'):

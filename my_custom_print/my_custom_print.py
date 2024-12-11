@@ -25,6 +25,9 @@ def pprint(*args):
     pp.pprint(*args)
     print(f'{Fore.RESET}')
 
+def print_white(text):
+    print(f'{Fore.WHITE}{text}{Fore.RESET}')
+
 def print_cyan(text):
     print(f'{Fore.CYAN}{text}{Fore.RESET}')
 

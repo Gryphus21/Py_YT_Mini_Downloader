@@ -174,7 +174,7 @@ def get_mdl_from_user_input() -> Union[list[MediaDescriptor], list]: # media des
     media_descriptor_list = list()
     media_id = str()
     while True:
-        mcp.print_cyan('\nDigita ID o URL, Enter per uscire:')
+        mcp.print_white('\nDigita ID o URL, Enter per uscire:')
         input_str = input()
         if (input_str == ''):
             if media_descriptor_list:
@@ -240,7 +240,7 @@ def get_mdl() -> Union[list[MediaDescriptor], list]:
     """
     use_file = False
     if file_exist(URL_LIST_FILENAME):
-        mcp.print_cyan(f'Vuoi caricare da file "{URL_LIST_FILENAME}\ ? (Y/y):')
+        mcp.print_white(f'Vuoi caricare da file "{URL_LIST_FILENAME}" ? (y):')
         use_file = True if input().lower()=='y' else False
     
     if (use_file):
@@ -313,15 +313,14 @@ def download_channel_image(channel_url: str, destination_path: str):
     import filecmp
     import shutil
 
-    TMP_FILENAME = 'tmp.jpg'
-    tmp_file_path = destination_path + '\\' + TMP_FILENAME
+    TMP_PROPIC_FILENAME = 'tmp.jpg'
+    tmp_propic_file_path = destination_path + '\\' + TMP_PROPIC_FILENAME
 
-    FILENAME = 'propic.jpg'
-    file_path = destination_path + '\\' + FILENAME
+    PROPIC_FILENAME = 'propic.jpg'
+    propic_file_path = destination_path + '\\' + PROPIC_FILENAME
 
     OLDPROPICS_FOLDER_NAME = 'Oldests'
     oldpropics_folder_path = destination_path + '\\' + OLDPROPICS_FOLDER_NAME
-
 
     def get_last(path) -> int:
         last = 0
@@ -334,20 +333,23 @@ def download_channel_image(channel_url: str, destination_path: str):
                 last = int(elem_name) # È un numero
         return last
 
-    if file_exist(file_path):   
-        download_filename = TMP_FILENAME
+    if file_exist(propic_file_path):
+        first_download = False
+        download_filename = TMP_PROPIC_FILENAME
     else:
-        download_filename = FILENAME
+        first_download = True
+        download_filename = PROPIC_FILENAME
 
     if (ytd.download_channel_propic(channel_url, destination_path, download_filename)):
-        if (not filecmp.cmp(tmp_file_path, file_path, shallow=False)):
-            check_folder_exist_and_make(oldpropics_folder_path)
-            old_file_path = destination_path + '\\' + str(get_last(oldpropics_folder_path)+1) + '.jpg'
-            os.rename(file_path, old_file_path) # Rinomina in 1,2,3... la propic già presente
-            shutil.move(old_file_path, oldpropics_folder_path) # la sposta nella cartella Oldests
-            os.rename(tmp_file_path, file_path) # Rinomina la tmp.jpg in propic.jpg
-        else:
-            os.remove(tmp_file_path)
+        if not first_download:
+            if (not filecmp.cmp(tmp_propic_file_path, propic_file_path, shallow=False)):
+                check_folder_exist_and_make(oldpropics_folder_path)
+                old_file_path = destination_path + '\\' + str(get_last(oldpropics_folder_path)+1) + '.jpg'
+                os.rename(propic_file_path, old_file_path) # Rinomina in 1,2,3... la propic già presente
+                shutil.move(old_file_path, oldpropics_folder_path) # la sposta nella cartella Oldests
+                os.rename(tmp_propic_file_path, propic_file_path) # Rinomina la tmp.jpg in propic.jpg
+            else:
+                os.remove(tmp_propic_file_path)
     else:
         raise Exception('Problemi durante lo scaricamento della propic')
 
@@ -393,6 +395,7 @@ class YouTubeShorts(YouTubeMedia):
 
 def main():
     colorama_init()
+    ##
     
     media_descriptor_list = get_mdl()
     if not media_descriptor_list:
@@ -403,89 +406,110 @@ def main():
         for i, single in enumerate(media_descriptor_list):
             mcp.print_cyan(f'{i+1} - {single.media_url}')
 
-
-    for single_media in media_descriptor_list:
-        mcp.print_cyan(f'\nInizio scaricamento per il media {single_media.media_url}...')
-        mcp.print_cyan('Scaricamento dei Metadati...')
-        result = get_media_metadata_youtubedl(single_media.media_url)
-        mcp.print_green('Metadati scaricati\n')
-
-        if 'entries' in result: # Nel caso fosse una Playlist
-            media_json_str = result['entries'][0]
-        else: # Altrimenti un media singolo
-            media_json_str = result
-
-        media_infos_json_obj = json.loads(json.dumps(media_json_str))
-
-        check_folder_exist_and_make(DOWNLOAD_FOLDER_PATH)
-
-        # Risoluzione del nome della cartella del canale e creazione
-        #TODO: Unificare tutti i dati del media su un Oggetto
-        #WARN: Possibile problemi con il nome del canale, se fosse troppo lungo o avesse caratteri strani
-        #WARN: I nomi dei media possono iniziare con un carattere 'Spazio' ?
-        #CAUT: Il nome del canale può essere 'zero width space'
-        #CAUT: Possono esistere nomi molto lunghi +400 caratteri
-        channel_name = media_infos_json_obj['channel']
-        channel_name_path_abj = replace_win_banned_char_for_path(channel_name_to_path(channel_name))
-        mcp.debug(f'channel_name:{channel_name}')
-        mcp.debug(type(channel_name))
-        channel_folder_path = DOWNLOAD_FOLDER_PATH + '\\' + channel_name_path_abj # Evita 'spazi' prima e dopo il nome canale per evitare problemi con Windows e soprattutto evita il NoneType
-        check_folder_exist_and_make(channel_folder_path)
-
-        # Risoluzione del nome della cartella del media e creazione
-        #DONE: Aggiungere una verifica del nome Video se potrebbe creare problemi se usato come nome per una cartella
-        #NOTE: Non rimuovere 'media_title_for_path'
-        media_title_for_path = replace_win_banned_char_for_path(media_infos_json_obj['title'])
-        media_folder_path = channel_folder_path + '\\' + media_title_for_path
-        check_folder_exist_and_make(media_folder_path)
+    mcp.print_white('\nVuoi richiedere lo scaricamento di tutti i media (massivo), oppure scaricare tutto singolarmente (più lento) ? (y):')
+    if (input().lower() == 'y'):
+        id_list = list()
+        mcp.print_cyan('Scaricamento massivo...')
+        #REFACT: Rifattorizzare qui
+        for single_media in media_descriptor_list:
+            #WARN: Se ci fossero problemi lato server o con le richieste ?
+            id = ddownr_client._request_video_download_on_server(single_media.media_url, VideoResolution.MAX_RES_TEST_ONLY)
+            mcp.debug(f'ID: {id}')
+            id_list.append(id)
+        if (len(id_list) != len(media_descriptor_list)):
+            raise Exception('La quantità degli ID in "id_list" non corrispondono con quelli dei media richiesti da scaricare ("media_descriptor_list"), forse ci sarà qualche problema con le richieste HTTP o col server')
         
-        # Cartella Videos
-        media_subfolder_path = media_folder_path + '\\' + VIDEO_FOLDER_NAME
-        check_folder_exist_and_make(media_subfolder_path)
-        
-        # Cartella Thumbnails
-        media_thumbnail_folder = media_folder_path + '\\' + THUMBNAILS_FOLDER_NAME
-        check_folder_exist_and_make(media_thumbnail_folder)
+        mcp.print_green('Tutte le richieste di scaricamento sono state inviate')
 
-        # Salvataggio del JSON obj
-        json_file_path = media_folder_path + '\\' + JSON_FILENAME
-        mcp.print_cyan('Salvo i metadati in un file JSON...')
-        save_to_json_file(json_file_path, media_infos_json_obj)
-        mcp.print_green('File salvato\n')
+        for single_id in id_list:
+            mcp.print_green(f'id: {single_id}')
+            ddownr_client._show_download_status(ddownr_client._get_download_progress(single_id))
+    else:
+        mcp.print_cyan('Scaricamento singolo...')
+        for single_media in media_descriptor_list:
+            mcp.print_cyan(f'\nInizio scaricamento per il media {single_media.media_url}...')
+            mcp.print_cyan('Scaricamento dei Metadati...')
+            result = get_media_metadata_youtubedl(single_media.media_url)
+            mcp.print_green('Metadati scaricati\n')
 
-        # Creazione di un file shortcut per il browser
-        mcp.print_cyan('\nCreazione dello shortcut al media per il browser...')
-        make_shortcut_link_file(single_media.media_url, media_folder_path+'\\'+SHORTCUT_BROWSER_FILENAME+SHORTCUT_BROWSER_FILE_EXT)
-        mcp.print_green('Shortcut file creato\n')
+            if 'entries' in result: # Nel caso fosse una Playlist
+                media_json_str = result['entries'][0]
+            else: # Altrimenti un media singolo
+                media_json_str = result
 
-        # Scaricamento delle Thumbnails
-        mcp.print_cyan('Scaricamento delle Thumbnails del media...')
-        mcp.debug(f'single_media.media_id: {single_media.media_id}')
-        ytd.download_video_thumbnails(single_media.media_id, media_thumbnail_folder)
-        mcp.print_green('Thumbnails del media scaricate\n')
+            media_infos_json_obj = json.loads(json.dumps(media_json_str))
 
-        # Scaricamento della ProPic del Canale
-        #TODO: Aggiungere un controllo nel caso si sovrascrivessere ProPic vecchie, già scaricate, con altre nuove
-        #CAUT: Questo sovrascriverebbe le vecchie immagini di profilo scaricate in precedenza
-        mcp.print_cyan('Scaricamento della ProPic...')
-        mcp.debug(f'channel_folder_path: {channel_folder_path}')
-        mcp.debug(f"channel url:{media_infos_json_obj['channel_url']}")
-        download_channel_image(media_infos_json_obj, channel_folder_path)
-        #ytd.download_channel_propic(media_infos_json_obj['channel_url'], channel_folder_path, 'propic.jpg')
-        mcp.print_green('ProPic scaricata (forse)\n')
+            check_folder_exist_and_make(DOWNLOAD_FOLDER_PATH)
 
-        mcp.print_cyan('Scaricamento del media...')
-        #TODO: Problemi con caratteri UniCode nel percorso di destinazione, questo genererà un Exit Code 23 di CURL
-        #CAUT: Possibile Exit Code 23 per CURL nel caso ci fosse un media o un canale con un carattere UniCode nel nome 
-        #TODO: Aggiungere un controllo della risoluzione massima del media, per salvare il file con l'estensione corretta
-        #CAUT: Se se sceglie una risoluzione che non è possibile scaricare, tipo un media che non ha il 144p; il server risponderà con un content vuoto, privo di JSON
-        ddownr_client.download_video_sync(single_media.media_url, media_subfolder_path, VideoResolution.MP4_720P)
+            # Risoluzione del nome della cartella del canale e creazione
+            #TODO: Unificare tutti i dati del media su un Oggetto
+            #WARN: Possibile problemi con il nome del canale, se fosse troppo lungo o avesse caratteri strani
+            #WARN: I nomi dei media possono iniziare con un carattere 'Spazio' ?
+            #CAUT: Il nome del canale può essere 'zero width space'
+            #CAUT: Possono esistere nomi molto lunghi +400 caratteri
+            channel_name = media_infos_json_obj['channel']
+            channel_name_path_abj = replace_win_banned_char_for_path(channel_name_to_path(channel_name))
+            mcp.debug(f'channel_name:{channel_name}')
+            mcp.debug(type(channel_name))
+            channel_folder_path = DOWNLOAD_FOLDER_PATH + '\\' + channel_name_path_abj # Evita 'spazi' prima e dopo il nome canale per evitare problemi con Windows e soprattutto evita il NoneType
+            check_folder_exist_and_make(channel_folder_path)
 
-        #del result
-        #del media_json_str
-        #del media_infos_json_obj
+            # Risoluzione del nome della cartella del media e creazione
+            #DONE: Aggiungere una verifica del nome Video se potrebbe creare problemi se usato come nome per una cartella
+            #NOTE: Non rimuovere 'media_title_for_path'
+            media_title_for_path = replace_win_banned_char_for_path(media_infos_json_obj['title'])
+            media_folder_path = channel_folder_path + '\\' + media_title_for_path
+            check_folder_exist_and_make(media_folder_path)
+            
+            # Cartella Videos
+            media_subfolder_path = media_folder_path + '\\' + VIDEO_FOLDER_NAME
+            check_folder_exist_and_make(media_subfolder_path)
+            
+            # Cartella Thumbnails
+            media_thumbnail_folder = media_folder_path + '\\' + THUMBNAILS_FOLDER_NAME
+            check_folder_exist_and_make(media_thumbnail_folder)
 
-        mcp.print_green(f'Fine scaricamento medias per il media "{single_media.media_url}"')
+            # Salvataggio del JSON obj
+            json_file_path = media_folder_path + '\\' + JSON_FILENAME
+            mcp.print_cyan('Salvo i metadati in un file JSON...')
+            save_to_json_file(json_file_path, media_infos_json_obj)
+            mcp.print_green('File salvato\n')
+
+            # Creazione di un file shortcut per il browser
+            mcp.print_cyan('\nCreazione dello shortcut al media per il browser...')
+            make_shortcut_link_file(single_media.media_url, media_folder_path+'\\'+SHORTCUT_BROWSER_FILENAME+SHORTCUT_BROWSER_FILE_EXT)
+            mcp.print_green('Shortcut file creato\n')
+
+            # Scaricamento delle Thumbnails
+            mcp.print_cyan('Scaricamento delle Thumbnails del media...')
+            mcp.debug(f'single_media.media_id: {single_media.media_id}')
+            ytd.download_video_thumbnails(single_media.media_id, media_thumbnail_folder)
+            mcp.print_green('Thumbnails del media scaricate\n')
+
+            # Scaricamento della ProPic del Canale
+            #TODO: Aggiungere un controllo nel caso si sovrascrivessere ProPic vecchie, già scaricate, con altre nuove
+            #CAUT: Questo sovrascriverebbe le vecchie immagini di profilo scaricate in precedenza
+            mcp.print_cyan('Scaricamento della ProPic...')
+            mcp.debug(f'channel_folder_path: {channel_folder_path}')
+            mcp.debug(f"channel url:{media_infos_json_obj['channel_url']}")
+            download_channel_image(media_infos_json_obj['channel_url'], channel_folder_path)
+            #ytd.download_channel_propic(media_infos_json_obj['channel_url'], channel_folder_path, 'propic.jpg')
+            mcp.print_green('ProPic scaricata (forse)\n')
+
+            #exit()
+
+            mcp.print_cyan('Scaricamento del media...')
+            #TODO: Problemi con caratteri UniCode nel percorso di destinazione, questo genererà un Exit Code 23 di CURL
+            #CAUT: Possibile Exit Code 23 per CURL nel caso ci fosse un media o un canale con un carattere UniCode nel nome 
+            #TODO: Aggiungere un controllo della risoluzione massima del media, per salvare il file con l'estensione corretta
+            #CAUT: Se se sceglie una risoluzione che non è possibile scaricare, tipo un media che non ha il 144p; il server risponderà con un content vuoto, privo di JSON
+            ddownr_client.download_video_sync(single_media.media_url, media_subfolder_path, VideoResolution.MP4_720P)
+
+            #del result
+            #del media_json_str
+            #del media_infos_json_obj
+
+            mcp.print_green(f'Fine scaricamento medias per il media "{single_media.media_url}"')
 
 if (__name__ == '__main__'):
     main()

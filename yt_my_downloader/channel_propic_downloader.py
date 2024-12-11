@@ -34,6 +34,8 @@ def download_channel_propic(channel_url: str, destination_path: str, filename: s
 
     json_payload = json.dumps(payload).encode('utf-8')
     request = urllib.request.Request(url=CONTENTFOREST_YTCD_XHR_URL, method='POST', headers=REQUEST_HEADER, data=bytes(json_payload))
+    mcp.debug(f'URL: {request.get_full_url}')
+    mcp.debug(f'payload: {json_payload}')
     response: HTTPResponse = urllib.request.urlopen(request)
 
     response_decoded = response.read().decode('utf-8')
