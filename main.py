@@ -84,6 +84,17 @@ def if_too_long_for_path(text: str, media_id: str) -> str:
     """
     return f'NAME TOO LONG [{len(text)}] - {media_id}' if len(text) > 40 else text
 
+def uni_replacer(input_str: str) -> str:
+    import sys
+    # It's ugly to look at, I know
+    output_str = str()
+    for c in input_str:
+        if sys.getsizeof(c) > 50:
+            output_str += c.replace(c, '[U]') #TODO: Replace placeholder characters with some const
+        else:
+            output_str += c
+    return output_str
+
 def check_folder_exist_and_make(folder_path: str):
     """
         Verifica se la cartella esiste, se non esiste la crea.
@@ -395,7 +406,6 @@ class YouTubeShorts(YouTubeMedia):
 
 def main():
     colorama_init()
-    ##
     
     media_descriptor_list = get_mdl()
     if not media_descriptor_list:
@@ -407,7 +417,7 @@ def main():
             mcp.print_cyan(f'{i+1} - {single.media_url}')
 
     mcp.print_white('\nVuoi richiedere lo scaricamento di tutti i media (massivo), oppure scaricare tutto singolarmente (più lento) ? (y):')
-    if (input().lower() == 'y'):
+    if (input().lower() == 'y'): #TODO: Adding timer for auto chose
         id_list = list()
         mcp.print_cyan('Scaricamento massivo...')
         #REFACT: Rifattorizzare qui
@@ -457,7 +467,7 @@ def main():
             # Risoluzione del nome della cartella del media e creazione
             #DONE: Aggiungere una verifica del nome Video se potrebbe creare problemi se usato come nome per una cartella
             #NOTE: Non rimuovere 'media_title_for_path'
-            media_title_for_path = replace_win_banned_char_for_path(media_infos_json_obj['title'])
+            media_title_for_path = uni_replacer(replace_win_banned_char_for_path(media_infos_json_obj['title'])) #NOTE: Replace some unicode characters for avoid problems with CURL downloader
             media_folder_path = channel_folder_path + '\\' + media_title_for_path
             check_folder_exist_and_make(media_folder_path)
             
@@ -503,7 +513,7 @@ def main():
             #CAUT: Possibile Exit Code 23 per CURL nel caso ci fosse un media o un canale con un carattere UniCode nel nome 
             #TODO: Aggiungere un controllo della risoluzione massima del media, per salvare il file con l'estensione corretta
             #CAUT: Se se sceglie una risoluzione che non è possibile scaricare, tipo un media che non ha il 144p; il server risponderà con un content vuoto, privo di JSON
-            ddownr_client.download_video_sync(single_media.media_url, media_subfolder_path, VideoResolution.MP4_720P)
+            ddownr_client.download_video_sync(single_media.media_url, media_subfolder_path, VideoResolution.MP4_1440P)
 
             #del result
             #del media_json_str
