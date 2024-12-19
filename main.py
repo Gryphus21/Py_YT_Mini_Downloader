@@ -88,7 +88,7 @@ def uni_replacer(input_str: str) -> str:
     output_str = str()
     for c in input_str:
         if (len(c.encode('utf-8')) > 1):
-            output_str += c.replace(c, '[U]') #TODO: Replace placeholder characters with some const
+            output_str += '[U]'
         else:
             output_str += c
     return output_str
