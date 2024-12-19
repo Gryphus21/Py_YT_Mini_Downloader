@@ -85,11 +85,9 @@ def if_too_long_for_path(text: str, media_id: str) -> str:
     return f'NAME TOO LONG [{len(text)}] - {media_id}' if len(text) > 40 else text
 
 def uni_replacer(input_str: str) -> str:
-    import sys
-    # It's ugly to look at, I know
     output_str = str()
     for c in input_str:
-        if sys.getsizeof(c) > 50:
+        if (len(c.encode('utf-8')) > 1):
             output_str += c.replace(c, '[U]') #TODO: Replace placeholder characters with some const
         else:
             output_str += c
