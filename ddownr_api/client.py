@@ -248,6 +248,7 @@ class Client():
             mcp.print_red('Il download è terminato ma non vi è nessun URL da cui scaricare il contenuto')
             mcp.debug(f'success: {success}')
             mcp.debug(f'download_url: {download_url}')
+            mcp.debug(f'text:\n{progress_text}\n')
         elif (bool(success) and progress_text == 'Finished'):
             mcp.print_cyan('Video scaricato sul server di terzi (Finished)')
         else:

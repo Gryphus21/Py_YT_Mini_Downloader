@@ -28,24 +28,24 @@ from yt_my_downloader.regex_yt_helper import RegexYtMatcher
 
 
 logging.basicConfig(level=logging.DEBUG, format="%(message)s")
-
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
-DOWNLOAD_FOLDER_NAME = 'Downloaded'
+MAIN_PATH_LOCATION = 'E:' if os.path.isdir('E:') else os.getcwd()
+DOWNLOAD_FOLDER_NAME = 'YT_Downloaded'
 VIDEO_FOLDER_NAME = 'Videos'
 THUMBNAILS_FOLDER_NAME = 'Thumbnails'
-DOWNLOAD_FOLDER_PATH = os.getcwd() + '\\' + DOWNLOAD_FOLDER_NAME
+DOWNLOAD_FOLDER_PATH = MAIN_PATH_LOCATION + '\\' + DOWNLOAD_FOLDER_NAME
 
 VIDEO_YT_URL_MASK = 'https://www.youtube.com/watch?v={}'
+
 JSON_FILENAME = 'media_infos.json'
 URL_LIST_FILENAME = 'urls.txt'
+URL_LIST_FILE_PATH = MAIN_PATH_LOCATION + '\\' + DOWNLOAD_FOLDER_NAME + '\\' + URL_LIST_FILENAME
+
+
 SHORTCUT_BROWSER_FILENAME = 'Video Link'
 SHORTCUT_BROWSER_FILE_EXT = '.url'
-
-
-
-ddownr_client = ddownr_api.Client()
 
 
 def replace_win_banned_char_for_path(text: str) -> str:
@@ -218,7 +218,7 @@ def get_mdl_from_urls_file() -> Union[list[MediaDescriptor], list]:
     media_descriptor_list = list()
     lines_checking = list()
 
-    lines = get_lines_from_file(URL_LIST_FILENAME)
+    lines = get_lines_from_file(URL_LIST_FILE_PATH)
     for pos, line in enumerate(lines):
         line_re = RegexYtMatcher(line)
         valid_line = line_re.is_valid_yt_media_url()
@@ -250,8 +250,8 @@ def get_mdl() -> Union[list[MediaDescriptor], list]:
             list[MediaDescriptor]: Lista di MediaDescriptor acquisiti dall'utente o dal file (se use_file = True).
     """
     use_file = False
-    if file_exist(URL_LIST_FILENAME):
-        mcp.print_white(f'Vuoi caricare da file "{URL_LIST_FILENAME}" ? (y):')
+    if file_exist(URL_LIST_FILE_PATH):
+        mcp.print_white(f'Vuoi caricare da file "{URL_LIST_FILENAME}" in "{URL_LIST_FILE_PATH}" ? (y):')
         use_file = True if input().lower()=='y' else False
     
     if (use_file):
@@ -384,6 +384,9 @@ def download_channel_image(channel_url: str, destination_path: str):
 def file_exist(file_path: str) -> bool:
     return os.path.isfile(file_path)
 
+def dir_exist(path: str) -> bool:
+    return os.path.isdir(path)
+
 
 #NOTE: Dovrebbe conservare solo i metadati scaricati dal modulo "youtube_dl".
 class VideoMetadata():
@@ -415,6 +418,8 @@ def main():
         mcp.print_cyan('\nQuesti sono gli URL caricati:')
         for i, single in enumerate(media_descriptor_list):
             mcp.print_cyan(f'{i+1} - {single.media_url}')
+
+    ddownr_client = ddownr_api.Client()
 
     mcp.print_white('\nVuoi richiedere lo scaricamento di tutti i media (massivo), oppure scaricare tutto singolarmente (più lento) ? (y):')
     if (input().lower() == 'y'): #TODO: Adding timer for auto chose
@@ -506,7 +511,6 @@ def main():
             #ytd.download_channel_propic(media_infos_json_obj['channel_url'], channel_folder_path, 'propic.jpg')
             mcp.print_green('ProPic scaricata (forse)\n')
 
-            #exit()
 
             mcp.print_cyan('Scaricamento del media...')
             #TODO: Problemi con caratteri UniCode nel percorso di destinazione, questo genererà un Exit Code 23 di CURL
@@ -519,7 +523,7 @@ def main():
             #del media_json_str
             #del media_infos_json_obj
 
-            mcp.print_green(f'Fine scaricamento medias per il media "{single_media.media_url}"')
+            mcp.print_green(f'Fine scaricamento per il media "{single_media.media_url}"')
 
 if (__name__ == '__main__'):
     main()
