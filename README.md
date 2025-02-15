@@ -6,6 +6,7 @@ It will allow you to download videos in various resolutions (if allowed), such a
 The downloaded files will be sorted into folders in the directory where the program is located.
 You can enter the ID or URL of the YouTube video.
 
+```bash
 ## Folders structure
 YT_Downloaded
 ├── urls.txt (List of URL to download, created by user, one URL or Video ID per line)
@@ -22,7 +23,7 @@ YT_Downloaded
         │   └── video.mp4
         ├── media_infos.json (Media infos in JSON format)
         └── Video Link.url (Link to the YT Video)
-
+```
 ## Notice:
 The external services used are:
 - [ddownr.com](https://ddownr.com) for downloading videos
