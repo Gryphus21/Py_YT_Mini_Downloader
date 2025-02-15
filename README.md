@@ -6,8 +6,8 @@ It will allow you to download videos in various resolutions (if allowed), such a
 The downloaded files will be sorted into folders in the directory where the program is located.
 You can enter the ID or URL of the YouTube video.
 
-```bash
 ## Folders structure
+```bash
 YT_Downloaded
 ├── urls.txt (List of URL to download, created by user, one URL or Video ID per line)
 └── *YouTube Channel Name*
