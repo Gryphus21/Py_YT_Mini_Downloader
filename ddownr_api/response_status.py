@@ -39,6 +39,7 @@ class RequestVideoDownloadResponse(ResponseCommonMembers):
     message: str = str()
     #----------
     errors: dict = {} # "string": ["string"]
+    additional_info: str = str() # default: null
     # ---------
 
     def __init__(self, 
@@ -52,7 +53,8 @@ class RequestVideoDownloadResponse(ResponseCommonMembers):
                  cachehash = Undefined(),
                  repeat_download = Undefined(), #NOTE: "false" in caso di YT url errato oppure durante il primo scaricamento, generalmente non definito nel JSON
                  message = Undefined(),
-                 errors = Undefined()
+                 errors = Undefined(),
+                 additional_info = Undefined()
                  ):
         
         super().__init__(_json_obj=_json_obj, success=success)
@@ -65,6 +67,7 @@ class RequestVideoDownloadResponse(ResponseCommonMembers):
         self.repeat_download = repeat_download
         self.message = message
         self.errors = errors
+        self.additional_info = additional_info
 
 # Richiesta corretta (già scaricato): success:1, progress:1000, download_url:"https://...", text:"Finished", message:"If you want..."
 # Richiesta con id errato: success:0, progress:0, download_url:null, text:null, message:"If you want..."

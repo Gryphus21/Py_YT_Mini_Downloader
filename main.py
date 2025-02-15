@@ -419,8 +419,9 @@ def main():
 
     ddownr_client = ddownr_api.Client()
 
-    mcp.print_white('\nVuoi richiedere lo scaricamento di tutti i media (massivo), oppure scaricare tutto singolarmente (più lento) ? (y):')
-    if (input().lower() == 'y'): #TODO: Adding timer for auto chose
+    #mcp.print_white('\nVuoi richiedere lo scaricamento di tutti i media (massivo), oppure scaricare tutto singolarmente (più lento) ? (y):')
+    #input().lower() == 'y'
+    if (False): #TODO: Adding timer for auto chose
         id_list = list()
         mcp.print_cyan('Scaricamento massivo...')
         #REFACT: Rifattorizzare qui
