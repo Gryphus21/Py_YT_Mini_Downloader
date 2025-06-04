@@ -30,8 +30,10 @@ from yt_my_downloader.regex_yt_helper import RegexYtMatcher
 logging.basicConfig(level=logging.DEBUG, format="%(message)s")
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+MAIN_PATH_LOCATION = os.path.expanduser('~') + '\\Desktop'
+if not os.path.isdir(MAIN_PATH_LOCATION):
+    raise Exception('Desktop folder not exists')
 
-MAIN_PATH_LOCATION = 'E:' if os.path.isdir('E:') else os.getcwd()
 DOWNLOAD_FOLDER_NAME = 'YT_Downloaded'
 VIDEO_FOLDER_NAME = 'Videos'
 THUMBNAILS_FOLDER_NAME = 'Thumbnails'
